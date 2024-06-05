@@ -1,0 +1,58 @@
+name:                snake
+version:             0.1.0.0
+github:              "mngrm3a/haskell-snake"
+license:             BSD-3-Clause
+author:              "mngrm3a"
+maintainer:          "9266859+mngrm3a@users.noreply.github.com"
+copyright:           "2024 mngrm3a"
+
+extra-source-files:
+- README.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+category:            Game
+description:         Please see the README on GitHub at <https://github.com/mngrm3a/haskell-snake#readme>
+spec-version:        0.36
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+dependencies:
+- base >=4.7 && <5
+- gloss
+
+library:
+  source-dirs: src
+
+executables:
+  snake-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - snake
+
+tests:
+  snake-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    build-tools:
+    - hspec-discover
+    dependencies:
+    - snake
+    - hspec
