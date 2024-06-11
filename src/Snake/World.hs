@@ -4,6 +4,7 @@ module Snake.World
   ( module Gloss.Extra.Clock,
     module Snake.World.Segments,
     World (..),
+    State (..),
     mkWorld,
     segmentSize,
     window,
