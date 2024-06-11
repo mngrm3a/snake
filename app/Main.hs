@@ -4,6 +4,7 @@ import Data.Function ((&))
 import Data.Functor ((<&>))
 import qualified Graphics.Gloss as Gloss
 import Graphics.Gloss.Interface.Environment (getScreenSize)
+import Snake.World (mkWorld)
 
 main :: IO ()
 main = do
@@ -13,7 +14,7 @@ main = do
     windowColor
     windowFPS
     -- initial world
-    ()
+    (mkWorld windowSize segmentSize)
     -- render world
     (const Gloss.Blank)
     -- handle events
@@ -25,6 +26,7 @@ main = do
     windowName = "Snake"
     windowSize = (800, 600)
     windowColor = Gloss.white
+    segmentSize = 20
 
 getCenteredWindowPosition :: (Int, Int) -> IO (Int, Int)
 getCenteredWindowPosition (winWidth, winHeight) =
