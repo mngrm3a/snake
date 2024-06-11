@@ -4,7 +4,9 @@ import Data.Function ((&))
 import Data.Functor ((<&>))
 import qualified Graphics.Gloss as Gloss
 import Graphics.Gloss.Interface.Environment (getScreenSize)
+import Snake.Event (handleEvent)
 import Snake.Render (renderWorld)
+import Snake.Update (updateWorld)
 import Snake.World (mkWorld)
 
 main :: IO ()
@@ -14,14 +16,10 @@ main = do
     (Gloss.InWindow windowName windowSize windowPosition)
     windowColor
     windowFPS
-    -- initial world
     (mkWorld windowSize segmentSize)
-    -- render world
     renderWorld
-    -- handle events
-    (const id)
-    -- update world
-    (const id)
+    handleEvent
+    updateWorld
   where
     windowFPS = 30
     windowName = "Snake"
