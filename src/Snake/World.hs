@@ -12,10 +12,13 @@ module Snake.World
     clock,
     segments,
     velocity,
+    keys,
   )
 where
 
+import Data.Sequence (Seq)
 import Gloss.Extra.Clock
+import qualified Graphics.Gloss.Interface.Pure.Game as Gloss
 import Lens.Micro.Platform (makeLenses)
 import Snake.Geometry (Box, V2 (V2), boxOfSizeAtOrigin)
 import Snake.World.Segments
@@ -28,7 +31,8 @@ data World = World
     _state :: !State,
     _clock :: !Clock,
     _segments :: !Segments,
-    _velocity :: !(V2 Float)
+    _velocity :: !(V2 Float),
+    _keys :: !(Seq Gloss.Key)
   }
   deriving (Eq, Show)
 
@@ -46,7 +50,8 @@ mkWorld (winWidth', winHeight') segmentSize'' =
       _state = GetReady,
       _clock = mkClock $ 1 / 8,
       _segments = mkSegments 0 rightwardsVelocity initialPosition,
-      _velocity = rightwardsVelocity
+      _velocity = rightwardsVelocity,
+      _keys = mempty
     }
   where
     (winWidth, winHeight) = (fromIntegral winWidth', fromIntegral winHeight')
