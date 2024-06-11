@@ -28,6 +28,7 @@ ghc-options:
 dependencies:
 - base >=4.7 && <5
 - gloss
+- microlens-platform
 
 library:
   source-dirs: src
