@@ -9,6 +9,10 @@ module Snake.Geometry.V2
     PointF,
     PointD,
 
+    -- * Alias accessors
+    _x,
+    _y,
+
     -- * Lenses
     u,
     x,
@@ -66,6 +70,22 @@ type V2D = V2 Double
 
 -- | Type synonym for 'V2' with 'Double' components representing a point.
 type PointD = V2 Double
+
+-- | Get the first component (U coordinate) of a vector.
+_x ::
+  -- | A point.
+  V2 s ->
+  -- | The Y component.
+  s
+_x = _u
+
+-- | Get the second component (V coordinate) of a vector.
+_y ::
+  -- | A point.
+  V2 s ->
+  -- | The Y component.
+  s
+_y = _v
 
 -- | Create a 'V2F' from two 'Float' values.
 v2F :: Float -> Float -> V2 Float
