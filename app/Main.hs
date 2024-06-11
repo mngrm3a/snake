@@ -4,6 +4,7 @@ import Data.Function ((&))
 import Data.Functor ((<&>))
 import qualified Graphics.Gloss as Gloss
 import Graphics.Gloss.Interface.Environment (getScreenSize)
+import Snake.Render (renderWorld)
 import Snake.World (mkWorld)
 
 main :: IO ()
@@ -16,7 +17,7 @@ main = do
     -- initial world
     (mkWorld windowSize segmentSize)
     -- render world
-    (const Gloss.Blank)
+    renderWorld
     -- handle events
     (const id)
     -- update world
