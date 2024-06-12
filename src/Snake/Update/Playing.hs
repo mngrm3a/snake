@@ -4,8 +4,9 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid (First (First, getFirst))
 import qualified Graphics.Gloss.Interface.Pure.Game as Gloss
 import Lens.Micro.Platform ((%~), (&), (.~))
-import Snake.Geometry (BoxF, PointF, V2 (V2), V2F, add)
+import Snake.Geometry.Box (BoxF)
 import qualified Snake.Geometry.Box as Box
+import Snake.Geometry.V2 (PointF, V2 (V2), V2F, add)
 import Snake.World
   ( Segments,
     State (Collision),

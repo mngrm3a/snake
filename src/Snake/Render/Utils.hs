@@ -2,7 +2,8 @@ module Snake.Render.Utils (renderScreenOverlay) where
 
 import qualified Graphics.Gloss as Gloss
 import Lens.Micro.Platform ((&))
-import Snake.Geometry (V2 (V2), size)
+import Snake.Geometry.Box (size)
+import Snake.Geometry.V2 (V2 (V2))
 import Snake.World (World (_window))
 
 renderScreenOverlay :: Gloss.Color -> World -> Gloss.Picture

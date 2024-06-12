@@ -3,7 +3,8 @@ module Snake.Render.Background (renderGrid) where
 import Data.Function ((&))
 import Data.Functor ((<&>))
 import qualified Graphics.Gloss as Gloss
-import Snake.Geometry (Box (_halfSize), V2 (V2))
+import Snake.Geometry.Box (Box (_halfSize))
+import Snake.Geometry.V2 (V2 (V2))
 import Snake.World (World (_segmentSize, _window))
 
 renderGrid :: World -> Gloss.Picture

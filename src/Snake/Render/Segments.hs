@@ -6,7 +6,7 @@ where
 
 import qualified Graphics.Gloss as Gloss
 import Lens.Micro.Platform ((&), (<&>))
-import Snake.Geometry
+import Snake.Geometry.V2 (PointF, V2 (V2), _x, _y)
 import Snake.World
   ( Segment (Segment, _end),
     Segments,

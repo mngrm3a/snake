@@ -2,7 +2,7 @@ module Snake.World.SegmentsSpec (spec) where
 
 import Data.Function ((&))
 import Data.Functor ((<&>))
-import Snake.Geometry (V2 (V2))
+import Snake.Geometry.V2 (V2 (V2))
 import Snake.World.Segments
   ( Segment (..),
     containsPoint,

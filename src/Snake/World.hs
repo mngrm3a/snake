@@ -20,7 +20,8 @@ import Data.Sequence (Seq)
 import Gloss.Extra.Clock
 import qualified Graphics.Gloss.Interface.Pure.Game as Gloss
 import Lens.Micro.Platform (makeLenses)
-import Snake.Geometry (Box, V2 (V2), boxOfSizeAtOrigin)
+import Snake.Geometry.Box (Box, boxOfSizeAtOrigin)
+import Snake.Geometry.V2 (V2 (V2))
 import Snake.World.Segments
 
 data World = World

@@ -18,7 +18,7 @@ where
 
 import qualified Data.List as L
 import Lens.Micro.Platform (makeLenses)
-import Snake.Geometry (V2, add)
+import Snake.Geometry.V2 (V2, add)
 
 -- | A data type representing a segment with a start and end point.
 data Segment = Segment
