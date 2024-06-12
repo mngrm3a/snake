@@ -3,6 +3,7 @@ module Snake.Update (updateWorld) where
 import qualified Data.Sequence as NE
 import Gloss.Extra.Clock (isResetting, tick)
 import Lens.Micro.Platform ((%~), (&), (.~), (^.))
+import Snake.Update.Collision (updateCollisionState)
 import Snake.Update.Playing (updatePlayingState)
 import Snake.World
   ( State (Collision, GetReady, Playing),
@@ -19,16 +20,14 @@ updateWorld clockTick w =
   where
     go =
       case w ^. state of
-        GetReady -> updateGetReadyState w
-        Playing -> updatePlayingState w
+        GetReady -> updateGetReadyState w & keys .~ mempty
+        Playing -> updatePlayingState w & keys .~ mempty
+        -- keep keys here so they can be processed after the transition to
+        -- Playing state
         Collision -> updateCollisionState w
-        & keys .~ mempty
 
 updateGetReadyState :: World -> World
 updateGetReadyState w =
   if w ^. keys & NE.null & not
     then w & state .~ Playing
     else w
-
-updateCollisionState :: World -> World
-updateCollisionState w = w

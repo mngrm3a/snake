@@ -3,12 +3,14 @@ module Snake.Render (renderWorld) where
 import qualified Graphics.Gloss as Gloss
 import Lens.Micro.Platform ((&), (^.))
 import Snake.Render.Segments
+  ( renderSegmentsAt,
+    renderSegmentsInterpolated,
+  )
 import Snake.Render.Utils (renderGrid, renderOverlay)
 import Snake.World
   ( State (Collision, GetReady, Playing),
     World,
     game,
-    info,
     segmentSize,
     state,
     window,
@@ -39,4 +41,8 @@ renderPlayingState :: World -> Gloss.Picture
 renderPlayingState = renderSegmentsInterpolated
 
 renderCollisionState :: World -> Gloss.Picture
-renderCollisionState = const Gloss.blank
+renderCollisionState w =
+  renderSegmentsAt 1 w
+    <> renderOverlay overlayColor (w ^. game)
+  where
+    overlayColor = Gloss.red & Gloss.withAlpha 0.1
