@@ -1,49 +1,39 @@
 module Snake.Render.Segments
-  ( renderSegmentEndPositions,
-    renderInterpolatedSegmentPositions,
+  ( renderSegmentsInterpolated,
+    renderSegmentsAt,
   )
 where
 
 import Gloss.Extra.Clock (progress)
 import qualified Graphics.Gloss as Gloss
-import Lens.Micro.Platform ((&), (<&>), (^.))
+import Lens.Micro.Platform (each, (&), (<&>), (^.), (^..))
 import Snake.Geometry.V2 (PointF, V2 (V2), x, y)
 import Snake.World (World, clock, segmentSize, segments)
-import Snake.World.Segments
-  ( Segment (Segment, _end),
-    Segments,
-    toList,
-  )
+import Snake.World.Segments (Segment (..), Segments, end, start, toList)
 
-renderInterpolatedSegmentPositions :: World -> Gloss.Picture
-renderInterpolatedSegmentPositions w =
-  interpolatedPositions clockProgress segs
-    <&> renderBodySegment bodyColor segSize
-    & Gloss.pictures
+renderSegmentsInterpolated :: World -> Gloss.Picture
+renderSegmentsInterpolated w =
+  renderSegmentsAt (w ^. clock & progress) w
+
+renderSegmentsAt :: Float -> World -> Gloss.Picture
+renderSegmentsAt progress' w =
+  let positions
+        | progress' == 0 = toList segs ^.. each . start
+        | progress' == 1 = toList segs ^.. each . end
+        | otherwise = interpolatedPositions progress' segs
+   in positions
+        <&> renderBodySegment bodyColor segSize
+        & Gloss.pictures
   where
-    clockProgress = w ^. clock & progress
     segs = w ^. segments
     bodyColor = Gloss.azure & Gloss.bright
     segSize = w ^. segmentSize
-
-renderSegmentEndPositions :: World -> Gloss.Picture
-renderSegmentEndPositions w =
-  endPositions segs
-    <&> renderBodySegment bodyColor segSize
-    & Gloss.pictures
-  where
-    bodyColor = Gloss.azure & Gloss.bright
-    segSize = w ^. segmentSize
-    segs = w ^. segments
 
 renderBodySegment :: Gloss.Color -> Float -> PointF -> Gloss.Picture
 renderBodySegment bodyColor segSize segPos =
   Gloss.rectangleSolid segSize segSize
     & Gloss.color bodyColor
     & Gloss.translate (segPos ^. x) (segPos ^. y)
-
-endPositions :: Segments -> [PointF]
-endPositions = fmap _end . toList
 
 interpolatedPositions :: Float -> Segments -> [PointF]
 interpolatedPositions t = fmap go . toList

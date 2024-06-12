@@ -2,7 +2,6 @@ module Snake.Update.Playing (updatePlayingState) where
 
 import Data.Maybe (fromMaybe)
 import Data.Monoid (First (First, getFirst))
-import Gloss.Extra.Clock (isResetting)
 import qualified Graphics.Gloss.Interface.Pure.Game as Gloss
 import Lens.Micro.Platform ((%~), (&), (.~), (^.))
 import Snake.Geometry.Box (BoxF)
@@ -11,26 +10,18 @@ import Snake.Geometry.V2 (PointF, V2 (V2), V2F, add)
 import Snake.World
   ( State (Collision),
     World,
-    clock,
     game,
     keys,
     segmentSize,
     segments,
     state,
     velocity,
-    window,
   )
 import Snake.World.Segments (Segments, moveTo, position)
 import qualified Snake.World.Segments as Seg
 
 updatePlayingState :: World -> World
 updatePlayingState w =
-  if w ^. clock & isResetting
-    then realUpdatePlayingState w
-    else w
-
-realUpdatePlayingState :: World -> World
-realUpdatePlayingState w =
   let (newVelocity, newPosition) = calcNewVelocityAndPosition w
    in if isColliding (w ^. game) (w ^. segments) newPosition
         then w & state .~ Collision

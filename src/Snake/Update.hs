@@ -14,12 +14,15 @@ import Snake.World
 
 updateWorld :: Float -> World -> World
 updateWorld clockTick w =
-  case w ^. state of
-    GetReady -> updateGetReadyState w
-    Playing -> updatePlayingState w
-    Collision -> updateCollisionState w
-    & keys %~ (if w ^. clock & isResetting then const mempty else id)
+  (if w ^. clock & isResetting then go else w)
     & clock %~ tick clockTick
+  where
+    go =
+      case w ^. state of
+        GetReady -> updateGetReadyState w
+        Playing -> updatePlayingState w
+        Collision -> updateCollisionState w
+        & keys .~ mempty
 
 updateGetReadyState :: World -> World
 updateGetReadyState w =
