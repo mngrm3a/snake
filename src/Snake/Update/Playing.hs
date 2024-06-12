@@ -4,31 +4,27 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid (First (First, getFirst))
 import Gloss.Extra.Clock (isResetting)
 import qualified Graphics.Gloss.Interface.Pure.Game as Gloss
-import Lens.Micro.Platform ((%~), (&), (.~))
+import Lens.Micro.Platform ((%~), (&), (.~), (^.))
 import Snake.Geometry.Box (BoxF)
 import qualified Snake.Geometry.Box as Box
 import Snake.Geometry.V2 (PointF, V2 (V2), V2F, add)
 import Snake.World
   ( State (Collision),
-    World
-      ( _clock,
-        _keys,
-        _segmentSize,
-        _segments,
-        _velocity,
-        _window
-      ),
+    World,
+    clock,
     keys,
+    segmentSize,
     segments,
     state,
     velocity,
+    window,
   )
 import Snake.World.Segments (Segments, moveTo, position)
 import qualified Snake.World.Segments as Seg
 
 updatePlayingState :: World -> World
 updatePlayingState w =
-  if w & _clock & isResetting
+  if w ^. clock & isResetting
     then realUpdatePlayingState w
     else w
 
@@ -43,8 +39,8 @@ realUpdatePlayingState w =
             & velocity .~ newVelocity
             & keys .~ mempty
   where
-    boundingBox = w & _window
-    segments' = w & _segments
+    boundingBox = w ^. window
+    segments' = w ^. segments
 
 calcNewVelocityAndPosition :: World -> (V2F, PointF)
 calcNewVelocityAndPosition w =
@@ -52,11 +48,11 @@ calcNewVelocityAndPosition w =
         foldMap (First . keyToNewVelocity curVelocity segSize) curKeys
           & getFirst
           & fromMaybe curVelocity
-   in (newVelocity, w & _segments & position & add newVelocity)
+   in (newVelocity, w ^. segments & position & add newVelocity)
   where
-    curVelocity = w & _velocity
-    curKeys = w & _keys
-    segSize = w & _segmentSize
+    curVelocity = w ^. velocity
+    curKeys = w ^. keys
+    segSize = w ^. segmentSize
 
 keyToNewVelocity :: V2F -> Float -> Gloss.Key -> Maybe V2F
 keyToNewVelocity (V2 vx vy) segSize key =

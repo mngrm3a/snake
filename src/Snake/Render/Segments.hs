@@ -6,9 +6,9 @@ where
 
 import Gloss.Extra.Clock (progress)
 import qualified Graphics.Gloss as Gloss
-import Lens.Micro.Platform ((&), (<&>))
-import Snake.Geometry.V2 (PointF, V2 (V2), _x, _y)
-import Snake.World (World (_clock, _segmentSize, _segments))
+import Lens.Micro.Platform ((&), (<&>), (^.))
+import Snake.Geometry.V2 (PointF, V2 (V2), x, y)
+import Snake.World (World, clock, segmentSize, segments)
 import Snake.World.Segments
   ( Segment (Segment, _end),
     Segments,
@@ -21,10 +21,10 @@ renderInterpolatedSegmentPositions w =
     <&> renderBodySegment bodyColor segSize
     & Gloss.pictures
   where
-    clockProgress = w & _clock & progress
-    segs = w & _segments
+    clockProgress = w ^. clock & progress
+    segs = w ^. segments
     bodyColor = Gloss.azure & Gloss.bright
-    segSize = w & _segmentSize
+    segSize = w ^. segmentSize
 
 renderSegmentEndPositions :: World -> Gloss.Picture
 renderSegmentEndPositions w =
@@ -33,14 +33,14 @@ renderSegmentEndPositions w =
     & Gloss.pictures
   where
     bodyColor = Gloss.azure & Gloss.bright
-    segSize = w & _segmentSize
-    segs = w & _segments
+    segSize = w ^. segmentSize
+    segs = w ^. segments
 
 renderBodySegment :: Gloss.Color -> Float -> PointF -> Gloss.Picture
 renderBodySegment bodyColor segSize segPos =
   Gloss.rectangleSolid segSize segSize
     & Gloss.color bodyColor
-    & Gloss.translate (segPos & _x) (segPos & _y)
+    & Gloss.translate (segPos ^. x) (segPos ^. y)
 
 endPositions :: Segments -> [PointF]
 endPositions = fmap _end . toList

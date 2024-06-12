@@ -5,16 +5,16 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid (First (First, getFirst))
 import Data.Sequence ((|>))
 import qualified Graphics.Gloss.Interface.Pure.Game as Gloss
-import Lens.Micro.Platform ((&), (.~))
-import Snake.World (State (..), World (_keys, _state), keys)
+import Lens.Micro.Platform ((&), (.~), (^.))
+import Snake.World (State (..), World, keys, state)
 
 handleEvent :: Gloss.Event -> World -> World
 handleEvent (Gloss.EventKey key Gloss.Down _ _) w =
-  let newKey = case w & _state of
+  let newKey = case w ^. state of
         GetReady -> filterKeys key $ const True
         Playing -> filterKeys key isArrowKey
         Collision -> filterKeys key $ const True
-      curKeys = Just $ w & _keys
+      curKeys = Just $ w ^. keys
       newKeys = getFirst $ First ((|>) <$> curKeys <*> newKey) <> First curKeys
    in w & keys .~ fromMaybe mempty newKeys
 handleEvent _ w = w

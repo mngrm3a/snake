@@ -2,11 +2,11 @@ module Snake.Update (updateWorld) where
 
 import qualified Data.Sequence as NE
 import Gloss.Extra.Clock (isResetting, tick)
-import Lens.Micro.Platform ((%~), (&), (.~))
+import Lens.Micro.Platform ((%~), (&), (.~), (^.))
 import Snake.Update.Playing (updatePlayingState)
 import Snake.World
   ( State (Collision, GetReady, Playing),
-    World (_clock, _keys, _state),
+    World,
     clock,
     keys,
     state,
@@ -14,16 +14,16 @@ import Snake.World
 
 updateWorld :: Float -> World -> World
 updateWorld clockTick w =
-  case w & _state of
+  case w ^. state of
     GetReady -> updateGetReadyState w
     Playing -> updatePlayingState w
     Collision -> updateCollisionState w
-    & keys %~ (if w & _clock & isResetting then const mempty else id)
+    & keys %~ (if w ^. clock & isResetting then const mempty else id)
     & clock %~ tick clockTick
 
 updateGetReadyState :: World -> World
 updateGetReadyState w =
-  if w & _keys & NE.null & not
+  if w ^. keys & NE.null & not
     then w & state .~ Playing
     else w
 

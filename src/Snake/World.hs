@@ -1,7 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Snake.World
-  ( World (..),
+  ( World,
     State (..),
     mkWorld,
     segmentSize,
