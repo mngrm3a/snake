@@ -30,7 +30,7 @@ jobs:
         with:
           ghc-version: ${{ matrix.ghc-version }}
           # Defaults, added for clarity:
-          cabal-version: '3.10.0.3'
+          cabal-version: '3.10.3.0'
           cabal-update: true
 
       - name: Configure the build
