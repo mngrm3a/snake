@@ -4,14 +4,14 @@ module Snake.Render.Segments
   )
 where
 
+import Gloss.Extra.Clock (progress)
 import qualified Graphics.Gloss as Gloss
 import Lens.Micro.Platform ((&), (<&>))
 import Snake.Geometry.V2 (PointF, V2 (V2), _x, _y)
-import Snake.World
+import Snake.World (World (_clock, _segmentSize, _segments))
+import Snake.World.Segments
   ( Segment (Segment, _end),
     Segments,
-    World (_clock, _segmentSize, _segments),
-    progress,
     toList,
   )
 

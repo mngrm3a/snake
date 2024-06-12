@@ -1,9 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Snake.World
-  ( module Gloss.Extra.Clock,
-    module Snake.World.Segments,
-    World (..),
+  ( World (..),
     State (..),
     mkWorld,
     segmentSize,
@@ -17,12 +15,12 @@ module Snake.World
 where
 
 import Data.Sequence (Seq)
-import Gloss.Extra.Clock
+import Gloss.Extra.Clock (Clock, mkClock)
 import qualified Graphics.Gloss.Interface.Pure.Game as Gloss
 import Lens.Micro.Platform (makeLenses)
 import Snake.Geometry.Box (Box, boxOfSizeAtOrigin)
 import Snake.Geometry.V2 (V2 (V2))
-import Snake.World.Segments
+import Snake.World.Segments (Segments, mkSegments)
 
 data World = World
   { -- environment

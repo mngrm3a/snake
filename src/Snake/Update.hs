@@ -1,16 +1,15 @@
 module Snake.Update (updateWorld) where
 
 import qualified Data.Sequence as NE
+import Gloss.Extra.Clock (isResetting, tick)
 import Lens.Micro.Platform ((%~), (&), (.~))
 import Snake.Update.Playing (updatePlayingState)
 import Snake.World
   ( State (Collision, GetReady, Playing),
     World (_clock, _keys, _state),
     clock,
-    isResetting,
     keys,
     state,
-    tick,
   )
 
 updateWorld :: Float -> World -> World
