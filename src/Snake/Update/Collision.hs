@@ -9,6 +9,7 @@ import Snake.World
   ( State (GetReady, Playing),
     World,
     keys,
+    lives,
     mkDefaultSegmentsAndVelocity,
     segmentSize,
     segments,
@@ -20,7 +21,10 @@ import Snake.World.Segments (Segments, position)
 import qualified Snake.World.Segments as Seg
 
 updateCollisionState :: World -> World
-updateCollisionState w = if canRecover w then recover else reset
+updateCollisionState w =
+  if canRecover w && w ^. lives > 0
+    then recover
+    else reset
   where
     recover =
       if w ^. keys & Seq.null & not
@@ -28,6 +32,7 @@ updateCollisionState w = if canRecover w then recover else reset
         else w
     reset =
       w
+        & lives .~ 3 -- TODO: this needs refactoring
         & velocity .~ newVelocity
         & segments .~ newSegments
         & state .~ GetReady

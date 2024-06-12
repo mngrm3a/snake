@@ -10,6 +10,7 @@ module Snake.World
     game,
     info,
     state,
+    lives,
     clock,
     segments,
     velocity,
@@ -33,6 +34,7 @@ data World = World
     _info :: !(Box Float),
     -- state
     _state :: !State,
+    _lives :: !Int,
     _clock :: !Clock,
     _segments :: !Segments,
     _velocity :: !(V2 Float),
@@ -56,6 +58,7 @@ mkWorld (winWidth', winHeight') segmentSize'' =
           V2 gcx (gcy + 0.5 * gameHeight + 1.5 * segmentSize'),
       -- state
       _state = GetReady,
+      _lives = 3,
       _clock = mkClock $ 1 / 8,
       _segments = segments',
       _velocity = velocity',

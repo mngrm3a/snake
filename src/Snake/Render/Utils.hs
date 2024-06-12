@@ -1,9 +1,16 @@
-module Snake.Render.Utils (renderOverlay, renderGrid) where
+module Snake.Render.Utils (renderOverlay, renderGrid, renderText) where
 
 import qualified Graphics.Gloss as Gloss
 import Lens.Micro.Platform ((&), (<&>), (^.))
 import Snake.Geometry.Box (BoxF, center, halfSize, size)
-import Snake.Geometry.V2 (V2 (V2))
+import Snake.Geometry.V2 (PointF, V2 (V2), x, y)
+
+renderText :: Gloss.Color -> PointF -> Float -> String -> Gloss.Picture
+renderText color position size text =
+  Gloss.text text
+    & Gloss.scale size size
+    & Gloss.color color
+    & Gloss.translate (position ^. x) (position ^. y)
 
 renderOverlay :: Gloss.Color -> BoxF -> Gloss.Picture
 renderOverlay color box =

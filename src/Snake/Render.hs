@@ -2,15 +2,18 @@ module Snake.Render (renderWorld) where
 
 import qualified Graphics.Gloss as Gloss
 import Lens.Micro.Platform ((&), (^.))
+import Snake.Geometry.Box (bottomLeft)
 import Snake.Render.Segments
   ( renderSegmentsAt,
     renderSegmentsInterpolated,
   )
-import Snake.Render.Utils (renderGrid, renderOverlay)
+import Snake.Render.Utils (renderGrid, renderOverlay, renderText)
 import Snake.World
   ( State (Collision, GetReady, Playing),
     World,
     game,
+    info,
+    lives,
     segmentSize,
     state,
     window,
@@ -27,6 +30,7 @@ renderWorld w =
 renderBackground :: World -> Gloss.Picture
 renderBackground w =
   renderGrid gridColor (w ^. segmentSize) (w ^. game)
+    <> renderText Gloss.red (w ^. info & bottomLeft) 0.4 (show (w ^. lives))
   where
     gridColor = Gloss.greyN 0.9
 
