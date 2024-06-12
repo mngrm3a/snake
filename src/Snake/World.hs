@@ -6,6 +6,8 @@ module Snake.World
     mkWorld,
     segmentSize,
     window,
+    game,
+    info,
     state,
     clock,
     segments,
@@ -18,7 +20,7 @@ import Data.Sequence (Seq)
 import Gloss.Extra.Clock (Clock, mkClock)
 import qualified Graphics.Gloss.Interface.Pure.Game as Gloss
 import Lens.Micro.Platform (makeLenses)
-import Snake.Geometry.Box (Box, boxOfSizeAtOrigin)
+import Snake.Geometry.Box (Box, boxOfSizeAt, boxOfSizeAtOrigin)
 import Snake.Geometry.V2 (V2 (V2))
 import Snake.World.Segments (Segments, mkSegments)
 
@@ -26,6 +28,8 @@ data World = World
   { -- environment
     _segmentSize :: !Float,
     _window :: !(Box Float),
+    _game :: !(Box Float),
+    _info :: !(Box Float),
     -- state
     _state :: !State,
     _clock :: !Clock,
@@ -45,6 +49,10 @@ mkWorld (winWidth', winHeight') segmentSize'' =
     { -- environment
       _segmentSize = segmentSize',
       _window = boxOfSizeAtOrigin winWidth winHeight,
+      _game = boxOfSizeAt gameWidth gameHeight gameCenter,
+      _info =
+        boxOfSizeAt gameWidth (2 * segmentSize') $
+          V2 gcx (gcy + 0.5 * gameHeight + 1.5 * segmentSize'),
       -- state
       _state = GetReady,
       _clock = mkClock $ 1 / 8,
@@ -53,7 +61,9 @@ mkWorld (winWidth', winHeight') segmentSize'' =
       _keys = mempty
     }
   where
-    (winWidth, winHeight) = (fromIntegral winWidth', fromIntegral winHeight')
     segmentSize' = fromIntegral segmentSize''
+    (winWidth, winHeight) = (fromIntegral winWidth', fromIntegral winHeight')
+    (gameWidth, gameHeight) = (winWidth - 2 * segmentSize', winHeight - 4 * segmentSize')
+    gameCenter@(V2 gcx gcy) = V2 0 $ (-1) * segmentSize'
     rightwardsVelocity = V2 segmentSize' 0
     initialPosition = V2 (segmentSize' / 2) (segmentSize' / 2)

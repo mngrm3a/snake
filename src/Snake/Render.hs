@@ -10,6 +10,8 @@ import Snake.Render.Utils (renderGrid, renderOverlay)
 import Snake.World
   ( State (Collision, GetReady, Playing),
     World,
+    game,
+    info,
     segmentSize,
     state,
     window,
@@ -25,7 +27,7 @@ renderWorld w =
 
 renderBackground :: World -> Gloss.Picture
 renderBackground w =
-  renderGrid gridColor (w ^. segmentSize) (w ^. window)
+  renderGrid gridColor (w ^. segmentSize) (w ^. game)
   where
     gridColor = Gloss.greyN 0.9
 

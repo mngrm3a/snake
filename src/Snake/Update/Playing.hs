@@ -12,6 +12,7 @@ import Snake.World
   ( State (Collision),
     World,
     clock,
+    game,
     keys,
     segmentSize,
     segments,
@@ -31,16 +32,13 @@ updatePlayingState w =
 realUpdatePlayingState :: World -> World
 realUpdatePlayingState w =
   let (newVelocity, newPosition) = calcNewVelocityAndPosition w
-   in if isColliding boundingBox segments' newPosition
+   in if isColliding (w ^. game) (w ^. segments) newPosition
         then w & state .~ Collision
         else
           w
             & segments %~ moveTo newPosition
             & velocity .~ newVelocity
             & keys .~ mempty
-  where
-    boundingBox = w ^. window
-    segments' = w ^. segments
 
 calcNewVelocityAndPosition :: World -> (V2F, PointF)
 calcNewVelocityAndPosition w =
