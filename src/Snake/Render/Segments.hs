@@ -8,26 +8,25 @@ import Gloss.Extra.Clock (progress)
 import qualified Graphics.Gloss as Gloss
 import Lens.Micro.Platform (each, (&), (<&>), (^.), (^..))
 import Snake.Geometry.V2 (PointF, V2 (V2), x, y)
-import Snake.World (World, clock, segmentSize, segments)
+import Snake.World (WorldEnv, WorldState, clock, segmentSize, segments)
 import Snake.World.Segments (Segment (..), Segments, end, start, toList)
 
-renderSegmentsInterpolated :: World -> Gloss.Picture
-renderSegmentsInterpolated w =
-  renderSegmentsAt (w ^. clock & progress) w
+renderSegmentsInterpolated :: WorldEnv -> WorldState -> Gloss.Picture
+renderSegmentsInterpolated we ws =
+  renderSegmentsAt we ws (ws ^. clock & progress)
 
-renderSegmentsAt :: Float -> World -> Gloss.Picture
-renderSegmentsAt progress' w =
+renderSegmentsAt :: WorldEnv -> WorldState -> Float -> Gloss.Picture
+renderSegmentsAt we ws progress' =
   let positions
         | progress' == 0 = toList segs ^.. each . start
         | progress' == 1 = toList segs ^.. each . end
         | otherwise = interpolatedPositions progress' segs
    in positions
-        <&> renderBodySegment bodyColor segSize
+        <&> renderBodySegment bodyColor (we ^. segmentSize)
         & Gloss.pictures
   where
-    segs = w ^. segments
+    segs = ws ^. segments
     bodyColor = Gloss.azure & Gloss.bright
-    segSize = w ^. segmentSize
 
 renderBodySegment :: Gloss.Color -> Float -> PointF -> Gloss.Picture
 renderBodySegment bodyColor segSize segPos =

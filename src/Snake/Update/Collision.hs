@@ -6,46 +6,37 @@ import Snake.Geometry.Box (BoxF)
 import qualified Snake.Geometry.Box as Box
 import Snake.Geometry.V2 (PointF, V2 (V2), add, sub)
 import Snake.World
-  ( State (GetReady, Playing),
-    World,
+  ( Status (Playing),
+    WorldEnv,
+    WorldState,
     keys,
     lives,
-    mkDefaultSegmentsAndVelocity,
+    mkWorldStateFromWorldEnv,
     segmentSize,
     segments,
-    state,
-    velocity,
+    status,
     window,
   )
 import Snake.World.Segments (Segments, position)
 import qualified Snake.World.Segments as Seg
 
-updateCollisionState :: World -> World
-updateCollisionState w =
-  if canRecover w && w ^. lives > 0
-    then recover
-    else reset
-  where
-    recover =
-      if w ^. keys & Seq.null & not
-        then w & state .~ Playing
-        else w
-    reset =
-      w
-        & lives .~ 3 -- TODO: this needs refactoring
-        & velocity .~ newVelocity
-        & segments .~ newSegments
-        & state .~ GetReady
-    (newSegments, newVelocity) = mkDefaultSegmentsAndVelocity (w ^. segmentSize)
+updateCollisionState :: WorldEnv -> WorldState -> WorldState
+updateCollisionState we ws =
+  if canRecover we ws && ws ^. lives > 0
+    then
+      if ws ^. keys & Seq.null & not
+        then ws & status .~ Playing
+        else ws
+    else mkWorldStateFromWorldEnv we
 
-canRecover :: World -> Bool
-canRecover w =
+canRecover :: WorldEnv -> WorldState -> Bool
+canRecover we ws =
   not $ all (isCollision bBox segs) $ segmentNeighbors segSize segPos
   where
-    segPos = w ^. segments & position
-    segs = w ^. segments
-    bBox = w ^. window
-    segSize = w ^. segmentSize
+    segPos = ws ^. segments & position
+    segs = ws ^. segments
+    bBox = we ^. window
+    segSize = we ^. segmentSize
 
 segmentNeighbors :: Float -> PointF -> [PointF]
 segmentNeighbors segSize pos =

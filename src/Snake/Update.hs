@@ -6,28 +6,32 @@ import Lens.Micro.Platform ((%~), (&), (.~), (^.))
 import Snake.Update.Collision (updateCollisionState)
 import Snake.Update.Playing (updatePlayingState)
 import Snake.World
-  ( State (Collision, GetReady, Playing),
+  ( Status (..),
     World,
+    WorldEnv,
+    WorldState,
     clock,
+    env,
     keys,
     state,
+    status,
   )
 
 updateWorld :: Float -> World -> World
 updateWorld clockTick w =
-  (if w ^. clock & isResetting then go else w)
-    & clock %~ tick clockTick
+  (if w ^. state . clock & isResetting then w & state .~ newWorldState else w)
+    & state . clock %~ tick clockTick
   where
-    go =
-      case w ^. state of
-        GetReady -> updateGetReadyState w & keys .~ mempty
-        Playing -> updatePlayingState w & keys .~ mempty
-        -- keep keys here so they can be processed after the transition to
-        -- Playing state
-        Collision -> updateCollisionState w
+    newWorldState =
+      case w ^. state . status of
+        GetReady -> updateGetReadyState we ws
+        Playing -> updatePlayingState we ws & keys .~ mempty
+        Collision -> updateCollisionState we ws
+    we = w ^. env
+    ws = w ^. state
 
-updateGetReadyState :: World -> World
-updateGetReadyState w =
-  if w ^. keys & NE.null & not
-    then w & state .~ Playing
-    else w
+updateGetReadyState :: WorldEnv -> WorldState -> WorldState
+updateGetReadyState _ ws =
+  if ws ^. keys & NE.null & not
+    then ws & status .~ Playing
+    else ws

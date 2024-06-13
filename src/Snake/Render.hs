@@ -9,44 +9,38 @@ import Snake.Render.Segments
   )
 import Snake.Render.Utils (renderGrid, renderOverlay, renderText)
 import Snake.World
-  ( State (Collision, GetReady, Playing),
-    World,
-    game,
-    info,
-    lives,
-    segmentSize,
-    state,
-    window,
-  )
 
 renderWorld :: World -> Gloss.Picture
 renderWorld w =
-  renderBackground w
-    <> case w ^. state of
-      GetReady -> renderGetReadyState w
-      Playing -> renderPlayingState w
-      Collision -> renderCollisionState w
+  renderBackground we ws
+    <> case w ^. state . status of
+      GetReady -> renderGetReadyState we ws
+      Playing -> renderPlayingState we ws
+      Collision -> renderCollisionState we ws
+  where
+    we = w ^. env
+    ws = w ^. state
 
-renderBackground :: World -> Gloss.Picture
-renderBackground w =
-  renderGrid gridColor (w ^. segmentSize) (w ^. game)
-    <> renderText Gloss.red (w ^. info & bottomLeft) 0.4 (show (w ^. lives))
+renderBackground :: WorldEnv -> WorldState -> Gloss.Picture
+renderBackground we ws =
+  renderGrid gridColor (we ^. segmentSize) (we ^. game)
+    <> renderText Gloss.red (we ^. info & bottomLeft) 0.4 (show (ws ^. lives))
   where
     gridColor = Gloss.greyN 0.9
 
-renderGetReadyState :: World -> Gloss.Picture
-renderGetReadyState w =
-  renderSegmentsAt 0 w
-    <> renderOverlay overlayColor (w ^. window)
+renderGetReadyState :: WorldEnv -> WorldState -> Gloss.Picture
+renderGetReadyState we ws =
+  renderSegmentsAt we ws 0
+    <> renderOverlay overlayColor (we ^. window)
   where
     overlayColor = Gloss.greyN 0.8 & Gloss.withAlpha 0.65
 
-renderPlayingState :: World -> Gloss.Picture
+renderPlayingState :: WorldEnv -> WorldState -> Gloss.Picture
 renderPlayingState = renderSegmentsInterpolated
 
-renderCollisionState :: World -> Gloss.Picture
-renderCollisionState w =
-  renderSegmentsAt 1 w
-    <> renderOverlay overlayColor (w ^. game)
+renderCollisionState :: WorldEnv -> WorldState -> Gloss.Picture
+renderCollisionState we ws =
+  renderSegmentsAt we ws 1
+    <> renderOverlay overlayColor (we ^. game)
   where
     overlayColor = Gloss.red & Gloss.withAlpha 0.1

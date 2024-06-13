@@ -2,14 +2,18 @@
 
 module Snake.World
   ( World,
-    State (..),
+    WorldEnv,
+    WorldState,
+    Status (..),
     mkWorld,
-    mkDefaultSegmentsAndVelocity,
+    mkWorldStateFromWorldEnv,
+    env,
+    state,
     segmentSize,
     window,
     game,
     info,
-    state,
+    status,
     lives,
     clock,
     segments,
@@ -21,19 +25,27 @@ where
 import Data.Sequence (Seq)
 import Gloss.Extra.Clock (Clock, mkClock)
 import qualified Graphics.Gloss.Interface.Pure.Game as Gloss
-import Lens.Micro.Platform (makeLenses)
+import Lens.Micro.Platform (makeLenses, (&))
 import Snake.Geometry.Box (Box, boxOfSizeAt, boxOfSizeAtOrigin)
-import Snake.Geometry.V2 (V2 (V2), V2F)
+import Snake.Geometry.V2 (V2 (V2), scale)
 import Snake.World.Segments (Segments, mkSegments)
 
 data World = World
-  { -- environment
-    _segmentSize :: !Float,
+  { _env :: !WorldEnv,
+    _state :: !WorldState
+  }
+  deriving (Eq, Show)
+
+data WorldEnv = WorldEnv
+  { _segmentSize :: !Float,
     _window :: !(Box Float),
     _game :: !(Box Float),
-    _info :: !(Box Float),
-    -- state
-    _state :: !State,
+    _info :: !(Box Float)
+  }
+  deriving (Eq, Show)
+
+data WorldState = WorldState
+  { _status :: !Status,
     _lives :: !Int,
     _clock :: !Clock,
     _segments :: !Segments,
@@ -42,41 +54,46 @@ data World = World
   }
   deriving (Eq, Show)
 
-data State = GetReady | Playing | Collision deriving (Eq, Show)
+data Status = GetReady | Playing | Collision deriving (Eq, Show)
 
 makeLenses ''World
+makeLenses ''WorldEnv
+makeLenses ''WorldState
 
-mkWorld :: (Int, Int) -> Int -> World
-mkWorld (winWidth', winHeight') segmentSize'' =
+mkWorld :: (Int, Int) -> Float -> World
+mkWorld winSize segSize =
   World
-    { -- environment
-      _segmentSize = segmentSize',
+    { _env = mkWorldEnv winSize segSize,
+      _state = mkWorldState segSize
+    }
+
+mkWorldEnv :: (Int, Int) -> Float -> WorldEnv
+mkWorldEnv (winWidth', winHeight') segSize =
+  WorldEnv
+    { _segmentSize = segSize,
       _window = boxOfSizeAtOrigin winWidth winHeight,
       _game = boxOfSizeAt gameWidth gameHeight gameCenter,
       _info =
-        boxOfSizeAt gameWidth (2 * segmentSize') $
-          V2 gcx (gcy + 0.5 * gameHeight + 1.5 * segmentSize'),
-      -- state
-      _state = GetReady,
+        boxOfSizeAt gameWidth (2 * segSize) $
+          V2 gcx (gcy + 0.5 * gameHeight + 1.5 * segSize)
+    }
+  where
+    (winWidth, winHeight) = (fromIntegral winWidth', fromIntegral winHeight')
+    (gameWidth, gameHeight) = (winWidth - 2 * segSize, winHeight - 4 * segSize)
+    gameCenter@(V2 gcx gcy) = V2 0 $ (-1) * segSize
+
+mkWorldState :: Float -> WorldState
+mkWorldState segSize =
+  WorldState
+    { _status = GetReady,
       _lives = 3,
       _clock = mkClock $ 1 / 8,
-      _segments = segments',
-      _velocity = velocity',
+      _segments = mkSegments 17 defaultVelocity $ scale 0.5 $ V2 segSize segSize,
+      _velocity = defaultVelocity,
       _keys = mempty
     }
   where
-    segmentSize' = fromIntegral segmentSize''
-    (winWidth, winHeight) = (fromIntegral winWidth', fromIntegral winHeight')
-    (gameWidth, gameHeight) = (winWidth - 2 * segmentSize', winHeight - 4 * segmentSize')
-    gameCenter@(V2 gcx gcy) = V2 0 $ (-1) * segmentSize'
-    (segments', velocity') = mkDefaultSegmentsAndVelocity segmentSize'
-
-mkDefaultSegmentsAndVelocity :: Float -> (Segments, V2F)
-mkDefaultSegmentsAndVelocity segSize =
-  ( mkSegments defaultNumExtraSegments defaultVelocity defaultPosition,
-    defaultVelocity
-  )
-  where
-    defaultNumExtraSegments = 17
     defaultVelocity = V2 segSize 0
-    defaultPosition = V2 (segSize / 2) (segSize / 2)
+
+mkWorldStateFromWorldEnv :: WorldEnv -> WorldState
+mkWorldStateFromWorldEnv we = mkWorldState (we & _segmentSize)
