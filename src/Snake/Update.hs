@@ -1,8 +1,8 @@
 module Snake.Update (updateWorld) where
 
 import qualified Data.Sequence as NE
-import Gloss.Extra.Clock (isResetting, tick)
 import Lens.Micro.Platform ((%~), (&), (.~), (^.))
+import Snake.Core.Clock (tick)
 import Snake.Update.Collision (updateCollisionState)
 import Snake.Update.Playing (updatePlayingState)
 import Snake.World
@@ -19,16 +19,20 @@ import Snake.World
 
 updateWorld :: Float -> World -> World
 updateWorld clockTick w =
-  (if w ^. state . clock & isResetting then w & state .~ newWorldState else w)
-    & state . clock %~ tick clockTick
+  let (hasReset, w') = tickClock w
+   in if hasReset then w' & state .~ newWorldState w' else w'
   where
-    newWorldState =
-      case w ^. state . status of
+    tickClock w' =
+      let (hasReset, newClock) = w' ^. state . clock & tick clockTick
+       in (hasReset, w' & state . clock .~ newClock)
+    newWorldState w' =
+      case w' ^. state . status of
         GetReady -> updateGetReadyState we ws
         Playing -> updatePlayingState we ws & keys .~ mempty
         Collision -> updateCollisionState we ws
-    we = w ^. env
-    ws = w ^. state
+      where
+        we = w' ^. env
+        ws = w' ^. state
 
 updateGetReadyState :: WorldEnv -> WorldState -> WorldState
 updateGetReadyState _ ws =

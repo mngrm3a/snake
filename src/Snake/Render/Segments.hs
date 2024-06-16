@@ -4,9 +4,9 @@ module Snake.Render.Segments
   )
 where
 
-import Gloss.Extra.Clock (progress)
 import qualified Graphics.Gloss as Gloss
 import Lens.Micro.Platform (each, (&), (<&>), (^.), (^..))
+import Snake.Core.Clock (progress)
 import Snake.Geometry.V2 (PointF, V2 (V2), x, y)
 import Snake.World (WorldEnv, WorldState, clock, segmentSize, segments)
 import Snake.World.Segments (Segment (..), Segments, end, start, toList)

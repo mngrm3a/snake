@@ -23,9 +23,9 @@ module Snake.World
 where
 
 import Data.Sequence (Seq)
-import Gloss.Extra.Clock (Clock, mkClock)
 import qualified Graphics.Gloss.Interface.Pure.Game as Gloss
 import Lens.Micro.Platform (makeLenses, (&))
+import Snake.Core.Clock (Clock, mkClock)
 import Snake.Geometry.Box (Box, boxOfSizeAt, boxOfSizeAtOrigin)
 import Snake.Geometry.V2 (V2 (V2), scale)
 import Snake.World.Segments (Segments, mkSegments)
