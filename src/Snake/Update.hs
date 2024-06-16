@@ -1,7 +1,7 @@
 module Snake.Update (updateWorld) where
 
 import qualified Data.Sequence as NE
-import Lens.Micro.Platform ((%~), (&), (.~), (^.))
+import Lens.Micro.Platform ((&), (.~), (^.))
 import Snake.Core.Clock (tick)
 import Snake.Update.Collision (updateCollisionState)
 import Snake.Update.Playing (updatePlayingState)

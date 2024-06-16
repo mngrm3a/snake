@@ -30,7 +30,7 @@ dependencies:
 - gloss
 - microlens-platform
 - containers
-
+- random
 library:
   source-dirs: src
 

@@ -1,9 +1,9 @@
 module Snake.Update.Playing (updatePlayingState) where
 
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, isNothing)
 import Data.Monoid (First (First, getFirst))
 import qualified Graphics.Gloss.Interface.Pure.Game as Gloss
-import Lens.Micro.Platform ((%~), (&), (-~), (.~), (^.))
+import Lens.Micro.Platform (each, (%~), (&), (+~), (-~), (.~), (^.), (^..))
 import Snake.Geometry.Box (BoxF)
 import qualified Snake.Geometry.Box as Box
 import Snake.Geometry.V2 (PointF, V2 (V2), V2F, add)
@@ -11,16 +11,21 @@ import Snake.World
   ( Status (Collision),
     WorldEnv,
     WorldState,
+    food,
     game,
+    gridPoints,
     keys,
     lives,
+    points,
+    rng,
     segmentSize,
     segments,
     status,
     velocity,
   )
-import Snake.World.Segments (Segments, moveTo, position)
+import Snake.World.Segments (Segments, end, extendTo, moveTo, position)
 import qualified Snake.World.Segments as Seg
+import System.Random (uniformR)
 
 updatePlayingState :: WorldEnv -> WorldState -> WorldState
 updatePlayingState we ws =
@@ -30,10 +35,32 @@ updatePlayingState we ws =
           ws
             & lives -~ 1
             & status .~ Collision
-        else
-          ws
-            & segments %~ moveTo newPosition
-            & velocity .~ newVelocity
+        else moveSegments we (ws & velocity .~ newVelocity) newPosition
+
+moveSegments :: WorldEnv -> WorldState -> PointF -> WorldState
+moveSegments we ws newPosition =
+  ( if canEatAt newPosition
+      then
+        ws
+          & segments %~ extendTo newPosition
+          & points +~ 10
+          & food .~ Nothing
+      else ws & segments %~ moveTo newPosition
+  )
+    & placeFood we
+  where
+    canEatAt = (==) (ws ^. food) . Just
+
+placeFood :: WorldEnv -> WorldState -> WorldState
+placeFood we ws =
+  -- TODO: what if there are no more free positions?
+  let (idx, gen) = uniformR (0, length freePositions - 1) $ ws ^. rng
+   in if ws ^. food & isNothing
+        then ws & rng .~ gen & food .~ Just (freePositions !! idx)
+        else ws
+  where
+    freePositions = filter (not . (`elem` segmentPositions)) $ we ^. gridPoints
+    segmentPositions = (ws ^. segments & Seg.toList) ^.. each . end
 
 calcNewVelocityAndPosition :: WorldEnv -> WorldState -> (V2F, PointF)
 calcNewVelocityAndPosition we ws =
